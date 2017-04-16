@@ -4,21 +4,18 @@ var weston;
 var chair;
 var chairList =[];
 var speedPlayer;
-
+//used for structures and player sprite grouping
+var floorGroup, levelGroup, doorframes;
 var doorframe=[];
-var exitMarker;
-var music;
-var level;
 var levelx = 0;
 var levely = 0;
 var SCALE = 1.0;
-
-//used for structures and player sprite grouping
-var floorGroup, levelGroup, chairGroup, doorframes;
-
-var controls;
+//var controls;
 var Ndown = false, Sdown = false, Edown = false, Wdown = false, 
 SEdown = false, NEdown = false, SWdown = false, NWdown = false;
+// var exitMarker;
+// var music;
+// var level;
 
 //levels are setup with directions like this
 //             / \
@@ -36,6 +33,7 @@ SEdown = false, NEdown = false, SWdown = false, NWdown = false;
 
 var levels = [
     //fourth floor
+    //33 width x 53 height
 [
 [3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3],
 [4, 6, 12, 0, 0, 0, 36, 6, 12, 55, 69, 6, 12, 0, 0, 7, 20, 30, 30, 21, 9, 36, 0, 63, 0, 0, 36, 0, 0, 11, 28, 9, 57], 
@@ -57,39 +55,39 @@ var levels = [
 [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 57],
 [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 57],
 [2, 55, 0, 7, 20, 0, 0, 21, 9, 45, 35, 35, 35, 35, 35, 35, 35, 35, 0, 0, 45, 35, 35, 35, 35, 35, 37, 35, 35, 35, 35, 35, 3],
-[2, 0, 0, 25, 0, 0, 0, 0, 26, 36, 0, 0, 63, 63, 63, 0, 0, 36, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[2, 0, 0, 24, 0, 0, 0, 0, 27, 36, 0, 62, 64, 44, 65, 61, 0, 36, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[2, 0, 0, 10, 23, 60, 60, 22, 8, 36, 0, 0, 19, 19, 19, 0, 47, 46, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[2, 0, 0, 7, 20, 59, 58, 21, 9, 36, 0, 0, 0, 0, 49, 50, 48, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[2, 0, 0, 25, 0, 0, 0, 0, 26, 36, 0, 0, 0, 53, 52, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[2, 0, 0, 24, 0, 0, 0, 0, 27, 36, 0, 49, 50, 48, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[2, 55, 0, 10, 23, 0, 0, 22, 8, 36, 47, 46, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 7, 20, 0, 0, 21, 9, 67, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 25, 0, 0, 0, 0, 26, 67, 0, 0, 36, 0, 0, 0, 0, 0, 1, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 24, 0, 0, 0, 0, 27, 67, 0, 0, 36, 0, 0, 0, 0, 0, 0, 49, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 55, 0, 10, 23, 60, 60, 22, 8, 67, 0, 0, 0, 0, 0, 0, 0, 0, 47, 46, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 7, 20, 59, 58, 21, 9, 67, 0, 0, 0, 0, 0, 0, 49, 50, 48, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 25, 0, 0, 0, 0, 26, 67, 0, 0, 0, 0, 0, 53, 52, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 24, 0, 0, 0, 0, 27, 67, 0, 0, 0, 49, 50, 48, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 10, 23, 0, 0, 22, 8, 67, 0, 0, 47, 46, 0, 63, 0, 63, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 48, 0, 62, 64, 44, 65, 61, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 19, 0, 19, 0, 19, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 35, 35, 35, 35, 35, 35, 35, 35, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 7, 20, 0, 0, 21, 9, 67, 0, 36, 0, 0, 63, 0, 63, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 55, 0, 25, 0, 0, 0, 0, 26, 67, 0, 38, 0, 62, 64, 44, 65, 61, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 24, 0, 0, 0, 0, 27, 67, 0, 38, 0, 0, 19, 0, 19, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 10, 23, 60, 60, 22, 8, 67, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 7, 20, 59, 58, 21, 9, 67, 0, 36, 35, 35, 35, 35, 35, 35, 35, 35, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 25, 0, 0, 0, 0, 26, 67, 0, 32, 62, 7, 28, 12, 12, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 24, 0, 0, 0, 0, 27, 67, 0, 0, 0, 0, 19, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 10, 23, 0, 0, 22, 8, 67, 0, 0, 68, 68, 68, 68, 68, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 62, 7, 28, 12, 12, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[2, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+[2, 0, 0, 25, 0, 0, 0, 0, 26, 36, 0, 0, 63, 63, 63, 0, 0, 36, 0, 0, 36, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70],
+[2, 0, 0, 24, 0, 0, 0, 0, 27, 36, 0, 62, 64, 44, 65, 61, 0, 36, 0, 0, 36, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70],
+[2, 0, 0, 10, 23, 60, 60, 22, 8, 36, 0, 0, 19, 19, 19, 0, 47, 46, 0, 0, 36, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70],
+[2, 0, 0, 7, 20, 59, 58, 21, 9, 36, 0, 0, 0, 0, 49, 50, 48, 0, 0, 0, 36, 70, 0, 0, 70, 70, 70, 70, 70, 70, 70, 70, 70],
+[2, 0, 0, 25, 0, 0, 0, 0, 26, 36, 0, 0, 0, 53, 52, 0, 0, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[2, 0, 0, 24, 0, 0, 0, 0, 27, 36, 0, 49, 50, 48, 0, 0, 0, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[2, 55, 0, 10, 23, 0, 0, 22, 8, 36, 47, 46, 0, 0, 0, 0, 0, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 70, 70, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 34, 71, 70, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 7, 20, 0, 0, 21, 9, 67, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 36, 70, 70, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 25, 0, 0, 0, 0, 26, 67, 0, 0, 36, 0, 0, 0, 0, 0, 1, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 24, 0, 0, 0, 0, 27, 67, 0, 0, 36, 0, 0, 0, 0, 0, 0, 49, 37, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 55, 0, 10, 23, 60, 60, 22, 8, 67, 0, 0, 0, 0, 0, 0, 0, 0, 47, 46, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 7, 20, 59, 58, 21, 9, 67, 0, 0, 0, 0, 0, 0, 49, 50, 48, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0,70],
+[4, 0, 0, 25, 0, 0, 0, 0, 26, 67, 0, 0, 0, 0, 0, 53, 52, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 24, 0, 0, 0, 0, 27, 67, 0, 0, 0, 49, 50, 48, 0, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 10, 23, 0, 0, 22, 8, 67, 0, 0, 47, 46, 0, 63, 0, 63, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 48, 0, 62, 64, 44, 65, 61, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 19, 0, 19, 0, 19, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 35, 35, 35, 35, 35, 35, 35, 35, 37, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 7, 20, 0, 0, 21, 9, 67, 0, 36, 0, 0, 63, 0, 63, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 55, 0, 25, 0, 0, 0, 0, 26, 67, 0, 38, 0, 62, 64, 44, 65, 61, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 24, 0, 0, 0, 0, 27, 67, 0, 38, 0, 0, 19, 0, 19, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 10, 23, 60, 60, 22, 8, 67, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 7, 20, 59, 58, 21, 9, 67, 0, 36, 35, 35, 35, 35, 35, 35, 35, 35, 37, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 25, 0, 0, 0, 0, 26, 67, 0, 32, 62, 7, 28, 12, 12, 36, 70, 70, 70, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 24, 0, 0, 0, 0, 27, 67, 0, 0, 0, 0, 19, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 10, 23, 0, 0, 22, 8, 67, 0, 0, 68, 68, 68, 68, 68, 36, 70, 0, 0, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 62, 7, 28, 12, 12, 36, 70, 0, 0, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
+[2, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 37, 70, 70, 70, 70, 70, 70, 70, 0, 0, 0, 0, 0, 0, 0, 70],
 ]
 //more levels here
 ];
@@ -97,11 +95,12 @@ var levels = [
 
 //==================================================//
 
+
 var init = function () {
     
     console.log("init() called");
     
-    var game = new Phaser.Game(900, 600, Phaser.CANVAS, 'test', null, false, true);
+    var game = new Phaser.Game(900, 600, Phaser.AUTO, 'test', null, false, true);
     
     var BasicGame = function (game) { };
     
@@ -109,118 +108,20 @@ var init = function () {
     
     BasicGame.Boot.prototype =
     {
+        
         preload: function () {
-            console.log("preload() called");
-            
-            game.world.setBounds(0, -window.innerHeight * 0.3, 5120, 5120);
+            //console.log("loadWorld() called");
+ 
+            //game.world.setBounds(0, -window.innerHeight * 0.3, 5120, 5120);
+            game.world.setBounds(0, -window.innerHeight * 0.3, 4028, 1500);
             
             //set bounds, physics, timer, anchor, and adds isometric game
             game.plugins.add(new Phaser.Plugin.Isometric(game));
             
             //========================loading assets==========================//
-            
-            //game.load.image('name_of_item', 'location');
-            game.load.image('groundTile', 'assets/images/0_groundTileV2.png');
-            
-            //sprites character sheet with size of sprite
-            game.load.spritesheet('customCharacter', 'assets/images/1_customCharacter.png', 40, 96);
-            game.load.spritesheet('weston', 'assets/images/51_Weston.png', 40, 96);
-            game.load.spritesheet('DeskChairV1', 'assets/images/19_DeskChairV1.png', 70, 120);
-            
-            game.load.image('WallV1', 'assets/images/2_WallV1.png');
-            game.load.image('WallV2', 'assets/images/3_WallV2.png');
-            
-            game.load.image('WindowTileV1', 'assets/images/4_WindowTileV1.png');
-            game.load.image('WindowTileV2', 'assets/images/5_WindowTileV2.png');
-            
-            game.load.image('DeskCornerV1', 'assets/images/6_DeskCornerV1.png');
-            game.load.image('DeskCornerV2', 'assets/images/7_DeskCornerV2.png');
-            game.load.image('DeskCornerV3', 'assets/images/8_DeskCornerV3.png');
-            game.load.image('DeskCornerV4', 'assets/images/9_DeskCornerV4.png');
-            game.load.image('DeskCornerV5', 'assets/images/10_DeskCornerV5.png');
-            
-            game.load.image('DeskDrawerV1', 'assets/images/11_DeskDrawerV1.png');
-            game.load.image('DeskDrawerV2', 'assets/images/12_DeskDrawerV2.png');
-            game.load.image('DeskDrawerV3', 'assets/images/13_DeskDrawerV3.png');
-            game.load.image('DeskDrawerV4', 'assets/images/14_DeskDrawerV4.png');
-            
-            game.load.image('DeskArmV1', 'assets/images/15_DeskArmV1.png');
-            game.load.image('DeskArmV2', 'assets/images/16_DeskArmV2.png');
-            game.load.image('DeskArmV3', 'assets/images/17_DeskArmV3.png');
-            game.load.image('DeskArmV4', 'assets/images/18_DeskArmV4.png');
-            
-            game.load.image('DeskArmV1_f', 'assets/images/20_DeskArmV1_f.png');
-            game.load.image('DeskArmV2_f', 'assets/images/21_DeskArmV2_f.png');
-            game.load.image('DeskArmV3_f', 'assets/images/22_DeskArmV3_f.png');
-            game.load.image('DeskArmV4_f', 'assets/images/23_DeskArmV4_f.png');
-            
-            game.load.image('DeskDrawerV1_f', 'assets/images/24_DeskDrawerV1_f.png');
-            game.load.image('DeskDrawerV2_f', 'assets/images/25_DeskDrawerV2_f.png');
-            game.load.image('DeskDrawerV3_f', 'assets/images/26_DeskDrawerV3_f.png');
-            game.load.image('DeskDrawerV4_f', 'assets/images/27_DeskDrawerV4_f.png');
-            
-            game.load.image('DeskTableTopV1', 'assets/images/28_DeskTableTopV1.png');
-            game.load.image('DeskTableTopV1_f', 'assets/images/29_DeskTableTopV1_f.png');
-            
-            game.load.image('DeskTableTopV2', 'assets/images/30_DeskTableTopV2.png');
-            
-            game.load.image('DividerWallV1', 'assets/images/31_DividerWallV1.png');
-            game.load.image('DividerWallV2', 'assets/images/32_DividerWallV2.png');
-            game.load.image('DoorFrameV1', 'assets/images/33_DoorFrameV1.png');
-            game.load.image('DoorFrameV2', 'assets/images/34_DoorFrameV2.png');
-            game.load.image('InternalWallV1', 'assets/images/35_InternalWallV1.png');
-            game.load.image('InternalWallV2', 'assets/images/36_InternalWallV2.png');
-            
-            game.load.image('InternalWallV3', 'assets/images/37_InternalWallV3.png');
-            game.load.image('InternalWallV4', 'assets/images/38_InternalWallV4.png');
-            game.load.image('InternalWallV5', 'assets/images/39_InternalWallV5.png');
-            game.load.image('InternalWallV6', 'assets/images/45_InternalWallV6.png');
-            
-            game.load.image('CircularTableV1', 'assets/images/40_CircularTableV1.png');
-            game.load.image('CircularTableV2', 'assets/images/41_CircularTableV2.png');
-            game.load.image('CircularTableV3', 'assets/images/42_CircularTableV3.png');
-            
-            game.load.image('TallTableV1', 'assets/images/43_TallTableV1.png');
-            
-            game.load.image('SquareSmallTableV1', 'assets/images/44_SquareSmallTableV1.png');
-            
-            game.load.image('InternalWallSlantV1', 'assets/images/46_InternalWallSlantV1.png');
-            game.load.image('InternalWallSlantV2', 'assets/images/47_InternalWallSlantV2.png');
-            game.load.image('InternalWallSlantV3', 'assets/images/48_InternalWallSlantV3.png');
-            game.load.image('InternalWallSlantV4', 'assets/images/49_InternalWallSlantV4.png');
-            game.load.image('InternalWallSlantV5', 'assets/images/50_InternalWallSlantV5.png');
-            
-            game.load.image('InternalWallDoorFrameV6', 'assets/images/52_InternalWallDoorFrameV6.png');
-            game.load.image('InternalWallDoorFrameV7', 'assets/images/53_InternalWallDoorFrameV7.png');
 
-            game.load.image('InternalWallPillerV1', 'assets/images/54_InternalWallPillerV1.png');
-            game.load.image('InternalWallPillerV2', 'assets/images/55_InternalWallPillerV2.png');
-            
-            game.load.image('WindowTileV3', 'assets/images/56_WindowTileV3.png');
-            game.load.image('WindowTileV4', 'assets/images/57_WindowTileV4.png');
-            
-            game.load.image('LargeCabinetV1', 'assets/images/58_LargeCabinetV1.png');
-            game.load.image('LargeCabinetV2', 'assets/images/59_LargeCabinetV2.png');
-            game.load.image('LargeCabinetV3', 'assets/images/60_LargeCabinetV3.png');
-            
-            game.load.image('DeskChairV2', 'assets/images/61_DeskChairV2.png');
-            game.load.image('DeskChairV3', 'assets/images/62_DeskChairV3.png');
-            game.load.image('DeskChairV4', 'assets/images/63_DeskChairV4.png');
-            
-            game.load.image('CircularTableV4', 'assets/images/64_circularTableV4.png');
-            game.load.image('CircularTableV5', 'assets/images/65_circularTableV5.png');
-            
-            game.load.image('DividerWallThinV1', 'assets/images/66_DividerWallThinV1.png');
-            game.load.image('DividerWallThinV2', 'assets/images/67_DividerWallThinV2.png');
-            game.load.image('DividerWallThinV3', 'assets/images/68_DividerWallThinV3.png');
-            game.load.image('DividerWallThinV4', 'assets/images/69_DividerWallThinV4.png');
-            
-            //game.load.spriteshet('name_of_sprite', 'location');
-            game.load.audio('smash!', 'assets/music/Smash!_-_Starbomb.ogg');
-            
-            //uses the png of the groundTile image
-            //game.load.atlasJSONHash('tileSet', 'assets/images/spritesV1.png', 'assets/images/spritesV1.json');
-            
+            loadWorld();
+                        
             //========================setting game settings==========================//
             
             //start the physical system
@@ -230,13 +131,17 @@ var init = function () {
             game.iso.anchor.setTo(0.5, 0);
         },
         create: function () {
-            
+            var num = 0;            
+            var l = levels[num];
+            var frame = 0;
+            var tile;
             //==================================================//
+            
+            createEachGroup();
+            
             //used for the fps debugging
             game.time.advancedTiming = true;
-            floorGroup = game.add.group();
-            levelGroup = game.add.group();
-            doorframes = game.add.group();
+            
             game.physics.startSystem(Phaser.Plugin.Isometric.ISOARCADE);
             
             // we won't really be using IsoArcade physics, but I've enabled it anyway so the debug bodies can be seen
@@ -339,33 +244,53 @@ var init = function () {
             'DividerWallThinV1',
             'DividerWallThinV2',
             'DividerWallThinV3',
-            'DividerWallThinV4' //69
+            'DividerWallThinV4',//69
+            
+            'BlackCeiling',     
+            'NextStage'         //71
             
             ];
             
-
+            //==================================================//
             
-            var num = 0;            
-            var l = levels[num];
             levelx = l.length;
             levely = l[0].length;
-            var frame = 0;
-            
-            
-            var tile;
-            
+            var tilesProcessed = 0;
             for (var y = 0; y<levely; y++) {
                 for (var x = 0; x<levelx; x++) {
+                    tilesProcessed++;
+                    
                     var spr = tiles[l[x][y]];
                     var xx = x * 38 * SCALE;
                     var yy = y * 38 * SCALE;
                     
-
+                    //==================================================//
+                    
                     //this places a base groundTile object
                     //the z coord is half the overall width of one tile
                     tile = game.add.isoSprite(xx, yy, -40 * SCALE, 'groundTile', 0, floorGroup);
                     tile.anchor.set(0.5,1);
                     tile.scale.set(SCALE); 
+                    
+                    if(spr=='NextStage') {
+                        
+                    }
+                    //===logic for categorizing 'spr' into which should have size and physics changes===//
+                    //player - needs first or game does not get created
+                    //NPCs - <custom behavior in the future.>
+                    //NPCs
+                    //etc...
+                    //else {
+                        //chairs    
+                            //four different directions for chair
+                        //door frames
+                        //ground
+                            //drawers
+                            //divider walls
+                            //inner pillars
+                            //other assets
+                    //}
+                    
                     
                     //add if for player
                     if(spr == 'player')
@@ -421,7 +346,7 @@ var init = function () {
                     {
                         if(spr=='DeskChairV1'||spr=='DeskChairV2'||spr=='DeskChairV3'||spr=='DeskChairV4')
                         {
-                            console.log('called chair group');
+                            //console.log('called chair group');
                             if(spr=='DeskChairV1')
                             {
                                 chair = game.add.isoSprite(xx, yy, -35 * SCALE, 'DeskChairV1', 0, levelGroup);
@@ -461,7 +386,7 @@ var init = function () {
                         }
                         else if(spr=='DoorFrameV1'||spr=='DoorFrameV2'||spr=='InternalWallDoorFrameV6'||spr=='InternalWallDoorFrameV7')
                         {
-                            console.log('called door frame group');
+                            //console.log('called door frame group');
                             doorframe[frame] = game.add.isoSprite(xx, yy, -35 * SCALE, spr, 0, doorframes)
                             doorframe[frame].type = spr;
                             doorframe[frame].scale.set(SCALE);
@@ -530,16 +455,28 @@ var init = function () {
                             {
                                 tile.body.setSize(35, 1, 1);
                             }
+                            else if(spr=='BlackCeiling')
+                            {
+                                tile.body.setSize(35, 35, 1);
+                            }
+                            else if(spr=='NextStage')
+                            {
+                                tile.body.setSize(35, 35, 0);
+                            }
                             //these should be conditionally applied to the correct tiles
                             tile.body.moves = false;
                             tile.body.immovable = true;
                         }
                     }
                     //add else and and if inside that points to everything thats not the groundTile
+                    
+                    //==================================================//
                 }
             }
             
             
+            
+            console.log("total tiles processed: " + tilesProcessed);
                         
             //=======================music===========================//
             
@@ -548,7 +485,7 @@ var init = function () {
             
             //adds music
             console.log("music init.");
-            music = game.add.audio('smash!');
+            //music = game.add.audio('smash!');
             
             //loops here for entry of button
             //while() {
@@ -726,13 +663,127 @@ var init = function () {
             //==================================================//
             
             game.debug.body(player);
-            game.debug.body(weston);
+            //game.debug.body(weston);
             //game.debug.body(chair);
             
             game.debug.spriteInfo(player, 32, 32);
-            game.debug.text(game.time.fps || '--', 2, 14, "#a7aebe");
-            //game.debug.text(Phaser.VERSION, 2, game.world.height - 2, "#ffff00");
+            game.debug.text(game.time.fps || '--', 2, 14, "#000");
+            game.debug.text(Phaser.VERSION, 2, game.world.height - 2, "#ffff00");
         }
+    };
+    
+    var loadWorld = function () {
+        console.log("loadWorld() called");
+        //game.load.image('name_of_item', 'location');
+        game.load.image('groundTile', 'assets/images/0_groundTileV2.png');
+        
+        //sprites character sheet with size of sprite
+        game.load.spritesheet('customCharacter', 'assets/images/1_customCharacter.png', 40, 96);
+        game.load.spritesheet('weston', 'assets/images/51_Weston.png', 40, 96);
+        game.load.spritesheet('DeskChairV1', 'assets/images/19_DeskChairV1.png', 70, 120);
+        
+        game.load.image('WallV1', 'assets/images/2_WallV1.png');
+        game.load.image('WallV2', 'assets/images/3_WallV2.png');
+        
+        game.load.image('WindowTileV1', 'assets/images/4_WindowTileV1.png');
+        game.load.image('WindowTileV2', 'assets/images/5_WindowTileV2.png');
+        
+        game.load.image('DeskCornerV1', 'assets/images/6_DeskCornerV1.png');
+        game.load.image('DeskCornerV2', 'assets/images/7_DeskCornerV2.png');
+        game.load.image('DeskCornerV3', 'assets/images/8_DeskCornerV3.png');
+        game.load.image('DeskCornerV4', 'assets/images/9_DeskCornerV4.png');
+        game.load.image('DeskCornerV5', 'assets/images/10_DeskCornerV5.png');
+        
+        game.load.image('DeskDrawerV1', 'assets/images/11_DeskDrawerV1.png');
+        game.load.image('DeskDrawerV2', 'assets/images/12_DeskDrawerV2.png');
+        game.load.image('DeskDrawerV3', 'assets/images/13_DeskDrawerV3.png');
+        game.load.image('DeskDrawerV4', 'assets/images/14_DeskDrawerV4.png');
+        
+        game.load.image('DeskArmV1', 'assets/images/15_DeskArmV1.png');
+        game.load.image('DeskArmV2', 'assets/images/16_DeskArmV2.png');
+        game.load.image('DeskArmV3', 'assets/images/17_DeskArmV3.png');
+        game.load.image('DeskArmV4', 'assets/images/18_DeskArmV4.png');
+        
+        game.load.image('DeskArmV1_f', 'assets/images/20_DeskArmV1_f.png');
+        game.load.image('DeskArmV2_f', 'assets/images/21_DeskArmV2_f.png');
+        game.load.image('DeskArmV3_f', 'assets/images/22_DeskArmV3_f.png');
+        game.load.image('DeskArmV4_f', 'assets/images/23_DeskArmV4_f.png');
+        
+        game.load.image('DeskDrawerV1_f', 'assets/images/24_DeskDrawerV1_f.png');
+        game.load.image('DeskDrawerV2_f', 'assets/images/25_DeskDrawerV2_f.png');
+        game.load.image('DeskDrawerV3_f', 'assets/images/26_DeskDrawerV3_f.png');
+        game.load.image('DeskDrawerV4_f', 'assets/images/27_DeskDrawerV4_f.png');
+        
+        game.load.image('DeskTableTopV1', 'assets/images/28_DeskTableTopV1.png');
+        game.load.image('DeskTableTopV1_f', 'assets/images/29_DeskTableTopV1_f.png');
+        
+        game.load.image('DeskTableTopV2', 'assets/images/30_DeskTableTopV2.png');
+        
+        game.load.image('DividerWallV1', 'assets/images/31_DividerWallV1.png');
+        game.load.image('DividerWallV2', 'assets/images/32_DividerWallV2.png');
+        game.load.image('DoorFrameV1', 'assets/images/33_DoorFrameV1.png');
+        game.load.image('DoorFrameV2', 'assets/images/34_DoorFrameV2.png');
+        game.load.image('InternalWallV1', 'assets/images/35_InternalWallV1.png');
+        game.load.image('InternalWallV2', 'assets/images/36_InternalWallV2.png');
+        
+        game.load.image('InternalWallV3', 'assets/images/37_InternalWallV3.png');
+        game.load.image('InternalWallV4', 'assets/images/38_InternalWallV4.png');
+        game.load.image('InternalWallV5', 'assets/images/39_InternalWallV5.png');
+        game.load.image('InternalWallV6', 'assets/images/45_InternalWallV6.png');
+        
+        game.load.image('CircularTableV1', 'assets/images/40_CircularTableV1.png');
+        game.load.image('CircularTableV2', 'assets/images/41_CircularTableV2.png');
+        game.load.image('CircularTableV3', 'assets/images/42_CircularTableV3.png');
+        
+        game.load.image('TallTableV1', 'assets/images/43_TallTableV1.png');
+        
+        game.load.image('SquareSmallTableV1', 'assets/images/44_SquareSmallTableV1.png');
+        
+        game.load.image('InternalWallSlantV1', 'assets/images/46_InternalWallSlantV1.png');
+        game.load.image('InternalWallSlantV2', 'assets/images/47_InternalWallSlantV2.png');
+        game.load.image('InternalWallSlantV3', 'assets/images/48_InternalWallSlantV3.png');
+        game.load.image('InternalWallSlantV4', 'assets/images/49_InternalWallSlantV4.png');
+        game.load.image('InternalWallSlantV5', 'assets/images/50_InternalWallSlantV5.png');
+        
+        game.load.image('InternalWallDoorFrameV6', 'assets/images/52_InternalWallDoorFrameV6.png');
+        game.load.image('InternalWallDoorFrameV7', 'assets/images/53_InternalWallDoorFrameV7.png');
+
+        game.load.image('InternalWallPillerV1', 'assets/images/54_InternalWallPillerV1.png');
+        game.load.image('InternalWallPillerV2', 'assets/images/55_InternalWallPillerV2.png');
+        
+        game.load.image('WindowTileV3', 'assets/images/56_WindowTileV3.png');
+        game.load.image('WindowTileV4', 'assets/images/57_WindowTileV4.png');
+        
+        game.load.image('LargeCabinetV1', 'assets/images/58_LargeCabinetV1.png');
+        game.load.image('LargeCabinetV2', 'assets/images/59_LargeCabinetV2.png');
+        game.load.image('LargeCabinetV3', 'assets/images/60_LargeCabinetV3.png');
+        
+        game.load.image('DeskChairV2', 'assets/images/61_DeskChairV2.png');
+        game.load.image('DeskChairV3', 'assets/images/62_DeskChairV3.png');
+        game.load.image('DeskChairV4', 'assets/images/63_DeskChairV4.png');
+        
+        game.load.image('CircularTableV4', 'assets/images/64_circularTableV4.png');
+        game.load.image('CircularTableV5', 'assets/images/65_circularTableV5.png');
+        
+        game.load.image('DividerWallThinV1', 'assets/images/66_DividerWallThinV1.png');
+        game.load.image('DividerWallThinV2', 'assets/images/67_DividerWallThinV2.png');
+        game.load.image('DividerWallThinV3', 'assets/images/68_DividerWallThinV3.png');
+        game.load.image('DividerWallThinV4', 'assets/images/69_DividerWallThinV4.png');
+        
+        game.load.image('BlackCeiling', 'assets/images/70_BlackCeiling.png');
+        game.load.image('NextStage', 'assets/images/71_NextStage.png');
+        
+        //game.load.spriteshet('name_of_sprite', 'location');
+        //game.load.audio('smash!', 'assets/music/Smash!_-_Starbomb.ogg');
+        
+        //uses the png of the groundTile image
+        //game.load.atlasJSONHash('tileSet', 'assets/images/spritesV1.png', 'assets/images/spritesV1.json');
+    };
+    
+    var createEachGroup = function() {
+        floorGroup = game.add.group();
+        levelGroup = game.add.group();
+        doorframes = game.add.group();
     };
     
     game.state.add('Boot', BasicGame.Boot);
