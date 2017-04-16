@@ -3,11 +3,11 @@ var StageSelect;
 var player;
 var weston;
 var chair;
-var chairList =[];
+var chairList = [];
+var doorframe = [];
 var speedPlayer;
 //used for structures and player sprite grouping
 var floorGroup, levelGroup, doorframes;
-var doorframe=[];
 var levelx = 0;
 var levely = 0;
 var SCALE = 1.0;
@@ -89,8 +89,13 @@ var levels = [
 [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
 [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
 [2, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 37, 70, 70, 70, 70, 70, 70, 70, 0, 0, 0, 0, 0, 0, 0, 70],
-]
+],
 //more levels here
+[0,0,0,0,0],
+[0,0,0,0,0],
+[0,0,0,0,0],
+[0,0,0,0,0],
+[0,0,0,0,0],
 ];
             
 
@@ -132,8 +137,8 @@ var init = function () {
             game.iso.anchor.setTo(0.5, 0);
         },
         create: function () {
-            var num = 0;            
-            var l = levels[num];
+            var currentLevel = 0;            
+            var l = levels[currentLevel];
             var frame = 0;
             var tile;
             //==================================================//
@@ -265,30 +270,8 @@ var init = function () {
                     var xx = x * 38 * SCALE;
                     var yy = y * 38 * SCALE;
 
-                    //===logic for categorizing 'spr' into which should have size and physics changes===//
-                    //player - needs first or game does not get created
-                    //NPCs - <custom behavior in the future.>
-                    //NPCs
-                    //etc...
-                    //else {
-                        //chairs    
-                            //four different directions for chair
-                        //door frames
-                        //ground
-                            //drawers
-                            //divider walls
-                            //inner pillars
-                            //other assets
-                    //}
-                    
-                    //==================================================//
-                    
                     //spr, xx, yy method
-                    
-                    
                     spriteConfig(spr, xx, yy, tile, frame);
-                    
-                    //==================================================//
                 }
             }
             
@@ -320,7 +303,7 @@ var init = function () {
             this.cW = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
             this.cE = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
             this.cN = game.input.keyboard.addKey(Phaser.Keyboard.UP);
-            
+
             game.input.keyboard.addKeyCapture([ 
                 Phaser.Keyboard.LEFT, 
                 Phaser.Keyboard.RIGHT, 
@@ -346,133 +329,141 @@ var init = function () {
             }
             
 	        player.body.velocity.x = 0;
-        player.body.velocity.y = 0;
-        
-        //using the Up, Down, Left, Right key
-        if (this.cN.isDown) 
-        {
-            Ndown = true;
-        	player.body.velocity.y = -speed;
-        	player.body.velocity.x = -speed;
-        	if(this.cE.isDown) 
-        	{
-        	    Ndown = false;
-        	    NEdown = true;
-        	    player.body.velocity.x = 0;
-        	}
-        	else if(this.cW.isDown)
-        	{
-        	    Ndown = false;
-        	    NWdown = true;
-        	    player.body.velocity.y = 0;
-        	}
-        	else if(this.cS.isDown)
-        	{
-        	    Ndown = false;
-        	    player.body.velocity.y = 0;
-        	    player.body.velocity.x = 0;
-        	}
-        }
-        else if (this.cS.isDown)
-        {
-            Sdown = true;
-        	player.body.velocity.y = speed;
-        	player.body.velocity.x = speed;
-        	if(this.cE.isDown) 
-        	{
-        	    Sdown = false;
-        	    SEdown = true;
-        	    player.body.velocity.y = 0;
-        	}
-        	else if(this.cW.isDown)
-        	{
-        	    Sdown = false;
-        	    SWdown = true;
-        	    player.body.velocity.x = 0;
-        	}
-        	else if(this.cN.isDown)
-        	{
-        	    Sdown = false;
-        	    player.body.velocity.y = 0;
-        	    player.body.velocity.x = 0;
-        	}
-        }
-        else if (this.cE.isDown) 
-        {
-            Edown = true;
-        	player.body.velocity.x = speed;
-        	player.body.velocity.y = -speed;
-        	if(this.cW.isDown)
-        	{
-        	    Edown = false;
-        	    player.body.velocity.y = 0;
-        	    player.body.velocity.x = 0;
-        	}
-        }
-        else if (this.cW.isDown)
-        {
-            Wdown = true;
-        	player.body.velocity.x = -speed;
-        	player.body.velocity.y = speed;
-        	if(this.cE.isDown)
-        	{
-        	    Wdown = false;
-        	    player.body.velocity.y = 0;
-        	    player.body.velocity.x = 0;
-        	}
-        }
-        else
-        {
-        	player.body.velocity.x = 0;
-        	player.body.velocity.y = 0;
-        }
-        
-        //which direction boolean activates which animation to play
-        if (Ndown == true) 
-        {
-        	player.animations.play('N');
-        }
-        else if (Sdown == true)
-        {
-        	player.animations.play('S');
-        }
-        else if (Edown == true) 
-        {
-        	player.animations.play('E');
-        }
-        else if (Wdown == true)
-        {
-        	player.animations.play('W');
-        }
-        else if (SEdown == true)
-        {
-        	player.animations.play('SE');
-        }
-        else if (SWdown == true)
-        {
-        	player.animations.play('SW');
-        }
-        else if (NWdown == true)
-        {
-        	player.animations.play('NW');
-        }
-        else if (NEdown == true)
-        {
-        	player.animations.play('NE');
-        }
-        else
-        {
-        	player.animations.stop();
-        }
-        
-        Ndown = false, Sdown = false, Edown = false, Wdown = false, 
-        SEdown = false, NEdown = false, SWdown = false, NWdown = false;
+            player.body.velocity.y = 0;
+            
+            //using the Up, Down, Left, Right key
+            if (this.cN.isDown) 
+            {
+                Ndown = true;
+            	player.body.velocity.y = -speed;
+            	player.body.velocity.x = -speed;
+            	if(this.cE.isDown) 
+            	{
+            	    Ndown = false;
+            	    NEdown = true;
+            	    player.body.velocity.x = 0;
+            	}
+            	else if(this.cW.isDown)
+            	{
+            	    Ndown = false;
+            	    NWdown = true;
+            	    player.body.velocity.y = 0;
+            	}
+            	else if(this.cS.isDown)
+            	{
+            	    Ndown = false;
+            	    player.body.velocity.y = 0;
+            	    player.body.velocity.x = 0;
+            	}
+            }
+            else if (this.cS.isDown)
+            {
+                Sdown = true;
+            	player.body.velocity.y = speed;
+            	player.body.velocity.x = speed;
+            	if(this.cE.isDown) 
+            	{
+            	    Sdown = false;
+            	    SEdown = true;
+            	    player.body.velocity.y = 0;
+            	}
+            	else if(this.cW.isDown)
+            	{
+            	    Sdown = false;
+            	    SWdown = true;
+            	    player.body.velocity.x = 0;
+            	}
+            	else if(this.cN.isDown)
+            	{
+            	    Sdown = false;
+            	    player.body.velocity.y = 0;
+            	    player.body.velocity.x = 0;
+            	}
+            }
+            else if (this.cE.isDown) 
+            {
+                Edown = true;
+            	player.body.velocity.x = speed;
+            	player.body.velocity.y = -speed;
+            	if(this.cW.isDown)
+            	{
+            	    Edown = false;
+            	    player.body.velocity.y = 0;
+            	    player.body.velocity.x = 0;
+            	}
+            }
+            else if (this.cW.isDown)
+            {
+                Wdown = true;
+            	player.body.velocity.x = -speed;
+            	player.body.velocity.y = speed;
+            	if(this.cE.isDown)
+            	{
+            	    Wdown = false;
+            	    player.body.velocity.y = 0;
+            	    player.body.velocity.x = 0;
+            	}
+            }
+            else
+            {
+            	player.body.velocity.x = 0;
+            	player.body.velocity.y = 0;
+            }
+            
+            //which direction boolean activates which animation to play
+            if (Ndown == true) 
+            {
+            	player.animations.play('N');
+            }
+            else if (Sdown == true)
+            {
+            	player.animations.play('S');
+            }
+            else if (Edown == true) 
+            {
+            	player.animations.play('E');
+            }
+            else if (Wdown == true)
+            {
+            	player.animations.play('W');
+            }
+            else if (SEdown == true)
+            {
+            	player.animations.play('SE');
+            }
+            else if (SWdown == true)
+            {
+            	player.animations.play('SW');
+            }
+            else if (NWdown == true)
+            {
+            	player.animations.play('NW');
+            }
+            else if (NEdown == true)
+            {
+            	player.animations.play('NE');
+            }
+            else
+            {
+            	player.animations.stop();
+            }
+            
+            Ndown = false, Sdown = false, Edown = false, Wdown = false, 
+            SEdown = false, NEdown = false, SWdown = false, NWdown = false;
             
 	        game.physics.isoArcade.collide(levelGroup);
 	        //this is used to sort the depth of the tiles
             game.iso.topologicalSort(levelGroup);
             
-            overLapCheck(player, StageSelect);
+            if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+                if(overLapCheck(player, StageSelect))
+                {
+                console.log("spaceBar");
+                }
+            }else{
+                
+            }
+            
         },
         
         render: function () {
@@ -492,6 +483,22 @@ var init = function () {
     };
     
     var spriteConfig = function (spr, xx, yy, tile, frame) {
+        
+        //===logic for categorizing 'spr' into which should have size and physics changes===//
+        //player - needs first or game does not get created
+        //NPCs - <custom behavior in the future.>
+        //NPCs
+        //etc...
+        //else {
+            //chairs    
+                //four different directions for chair
+            //door frames
+            //ground
+                //drawers
+                //divider walls
+                //inner pillars
+                //other assets
+        //}
         
         //this places a base groundTile object
         //the z coord is half the overall width of one tile
