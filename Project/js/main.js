@@ -1,4 +1,5 @@
 //player group used for the sprite control
+var StageSelect;
 var player;
 var weston;
 var chair;
@@ -263,18 +264,7 @@ var init = function () {
                     var spr = tiles[l[x][y]];
                     var xx = x * 38 * SCALE;
                     var yy = y * 38 * SCALE;
-                    
-                    //==================================================//
-                    
-                    //this places a base groundTile object
-                    //the z coord is half the overall width of one tile
-                    tile = game.add.isoSprite(xx, yy, -40 * SCALE, 'groundTile', 0, floorGroup);
-                    tile.anchor.set(0.5,1);
-                    tile.scale.set(SCALE); 
-                    
-                    if(spr=='NextStage') {
-                        
-                    }
+
                     //===logic for categorizing 'spr' into which should have size and physics changes===//
                     //player - needs first or game does not get created
                     //NPCs - <custom behavior in the future.>
@@ -291,184 +281,12 @@ var init = function () {
                             //other assets
                     //}
                     
+                    //==================================================//
                     
-                    //add if for player
-                    if(spr == 'player')
-                    {
-                        //trying to find why the player sprite is spawning under a few other sprites
-                        //set to -32 for the size of the sprite
-                        player = game.add.isoSprite(xx, yy, -32 * SCALE, 'customCharacter', 0, levelGroup);
-                        player.anchor.set(0.5, 1);
-                        player.scale.setTo(0.9);
-                        //=======================walking animations===========================//
-                        
-                        // custom Person sprite animation loading and setting
-                        
-                        speedPlayer = 6;
-                        
-                        player.animations.add('SW', [1, 0, 1, 2], speedPlayer, true);
-                        player.animations.add('W',  [4, 3, 4, 5], speedPlayer, true);
-                        player.animations.add('SE', [7, 6, 7, 8], speedPlayer, true);
-                        player.animations.add('E',  [10, 9, 10, 11], speedPlayer, true);
-                        player.animations.add('S',  [13, 12, 13, 14], speedPlayer, true);
-                        player.animations.add('N',  [16, 15, 16, 17], speedPlayer, true);
-                        player.animations.add('NW', [19, 18, 19, 20], speedPlayer, true);
-                        player.animations.add('NE', [22, 21, 22, 23], speedPlayer, true);
-            
-                        //enables physics on the player
-                        game.physics.isoArcade.enable(player);
-                        player.body.collideWorldBounds = true;
-                        
-                        // x, y, z
-                        player.body.setSize(20, 20, 1);
-                    }
-                    //animated characters in the office
-                    else if(spr=='weston')
-                    {
-                        weston = game.add.isoSprite(xx+4, yy+4, -32 * SCALE, 'weston', 0, levelGroup)
-                        weston.anchor.set(0.5, 1);
-                        weston.scale.setTo(1);
-                        
-                        weston.animations.add('standing', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 6, true);
-                        
-                        game.physics.isoArcade.enable(weston);
-                        weston.body.collideWorldBounds = true;
-                        
-                        // x, y, z
-                        weston.body.setSize(20,20,1);
-                        weston.body.bounce.set(1, 1, 0);
-                        weston.body.drag.set(200, 200, 0);
-                    }
-                    //else if()
-                    //{
-                    //} //end of characters in office
-                    else
-                    {
-                        if(spr=='DeskChairV1'||spr=='DeskChairV2'||spr=='DeskChairV3'||spr=='DeskChairV4')
-                        {
-                            //console.log('called chair group');
-                            if(spr=='DeskChairV1')
-                            {
-                                chair = game.add.isoSprite(xx, yy, -35 * SCALE, 'DeskChairV1', 0, levelGroup);
-                            }
-                            else if(spr=='DeskChairV2')
-                            {
-                                chair = game.add.isoSprite(xx, yy, -35 * SCALE, 'DeskChairV2', 0, levelGroup);
-                            }
-                            else if(spr=='DeskChairV3')
-                            {
-                                chair = game.add.isoSprite(xx, yy, -35 * SCALE, 'DeskChairV3', 0, levelGroup);
-                            }
-                            else if(spr=='DeskChairV4')
-                            {
-                                chair = game.add.isoSprite(xx, yy, -35 * SCALE, 'DeskChairV4', 0, levelGroup);
-                            }
-                            chair.anchor.set(0.5, 1);
-                            chair.scale.setTo(1);
-                            
-                            game.physics.isoArcade.enable(chair);
-                            chair.body.collideWorldBounds = true;
-                            
-                            // x, y, z
-                            if(spr=='DeskChairV1'||spr=='DeskChairV3')
-                            {
-                                chair.body.setSize(30, 20, 1);
-                            }
-                            else if(spr=='DeskChairV2'||spr=='DeskChairV4')
-                            {
-                                chair.body.setSize(20, 30, 1);
-                            }
-                            
-                            chair.body.bounce.set(1, 1, 0);
-                            chair.body.drag.set(100, 100, 0);
-                            
-                            chairList.push(chair);
-                        }
-                        else if(spr=='DoorFrameV1'||spr=='DoorFrameV2'||spr=='InternalWallDoorFrameV6'||spr=='InternalWallDoorFrameV7')
-                        {
-                            //console.log('called door frame group');
-                            doorframe[frame] = game.add.isoSprite(xx, yy, -35 * SCALE, spr, 0, doorframes)
-                            doorframe[frame].type = spr;
-                            doorframe[frame].scale.set(SCALE);
-                            doorframe[frame].anchor.set(0.5,1);
-                            game.physics.isoArcade.enable(doorframe);
-                            doorframe[frame].body.moves = false;
-                            doorframe[frame++].body.immovable = true;
-                        }
-                        else if(spr != 'groundTile')
-                        {
-                            
-                            if(spr=='DeskDrawerV3'||spr=='DeskDrawerV4'||spr=='DeskDrawerV3_f'||spr=='DeskDrawerV4_f')
-                            {
-                                //corects postioning issues with these tiles
-                                xx -= 4;
-                                yy -= 3;
-                            }
-                            else if(spr=='DividerWallThinV3')
-                            {
-                                xx += 35;
-                            }
-                            else if(spr=='DividerWallThinV4')
-                            {
-                                yy += 35;
-                            }
-                            //the z coord is half the overall width of one object
-                            tile = game.add.isoSprite(xx, yy, -35 * SCALE, spr, 0, levelGroup);
-                            tile.type = spr;
-                            tile.scale.set(SCALE);
-                            tile.anchor.set(0.5,1);
-                            game.physics.isoArcade.enable(tile);
-                            tile.body.collisionWorldBounds = true;
-                            if(spr=='InternalWallPillerV1'||spr=='InternalWallPillerV2'||spr=='InternalWallSlantV3')
-                            {
-                                tile.body.setSize(15, 15, 1);
-                            }
-                            else if(spr=='InternalWallSlantV1')
-                            {
-                                tile.body.setSize(20, 35, 1);
-                            }
-                            else if(spr=='LargeCabinetV1'||spr=='LargeCabinetV2'||spr=='LargeCabinetV3')
-                            {
-                                tile.body.setSize(25, 35, 1);
-                            }
-                            else if(spr=='DeskArmV1'||spr=='DeskArmV2')
-                            {
-                                tile.body.setSize(35, 25, 1);
-                            }
-                            else if(spr=='DeskArmV1_f'||spr=='DeskArmV2_f')
-                            {
-                                tile.body.setSize(25, 35, 1);
-                            }
-                            else if(spr=='DividerWallThinV1')
-                            {
-                                tile.body.setSize(10, 35, 1);
-                            }
-                            else if(spr=='DividerWallThinV2')
-                            {
-                                tile.body.setSize(35, 10, 1);
-                            }
-                            else if(spr=='DividerWallThinV3')
-                            {
-                                tile.body.setSize(1, 35, 1);
-                            }
-                            else if(spr=='DividerWallThinV4')
-                            {
-                                tile.body.setSize(35, 1, 1);
-                            }
-                            else if(spr=='BlackCeiling')
-                            {
-                                tile.body.setSize(35, 35, 1);
-                            }
-                            else if(spr=='NextStage')
-                            {
-                                tile.body.setSize(35, 35, 0);
-                            }
-                            //these should be conditionally applied to the correct tiles
-                            tile.body.moves = false;
-                            tile.body.immovable = true;
-                        }
-                    }
-                    //add else and and if inside that points to everything thats not the groundTile
+                    //spr, xx, yy method
+                    
+                    
+                    spriteConfig(spr, xx, yy, tile, frame);
                     
                     //==================================================//
                 }
@@ -528,134 +346,135 @@ var init = function () {
             }
             
 	        player.body.velocity.x = 0;
-	        player.body.velocity.y = 0;
-	        
-	        //using the Up, Down, Left, Right key
-	        if (this.cN.isDown) 
-	        {
-	            Ndown = true;
-	        	player.body.velocity.y = -speed;
-	        	player.body.velocity.x = -speed;
-	        	if(this.cE.isDown) 
-	        	{
-	        	    Ndown = false;
-	        	    NEdown = true;
-	        	    player.body.velocity.x = 0;
-	        	}
-	        	else if(this.cW.isDown)
-	        	{
-	        	    Ndown = false;
-	        	    NWdown = true;
-	        	    player.body.velocity.y = 0;
-	        	}
-	        	else if(this.cS.isDown)
-	        	{
-	        	    Ndown = false;
-	        	    player.body.velocity.y = 0;
-	        	    player.body.velocity.x = 0;
-	        	}
-	        }
-	        else if (this.cS.isDown)
-	        {
-	            Sdown = true;
-	        	player.body.velocity.y = speed;
-	        	player.body.velocity.x = speed;
-	        	if(this.cE.isDown) 
-	        	{
-	        	    Sdown = false;
-	        	    SEdown = true;
-	        	    player.body.velocity.y = 0;
-	        	}
-	        	else if(this.cW.isDown)
-	        	{
-	        	    Sdown = false;
-	        	    SWdown = true;
-	        	    player.body.velocity.x = 0;
-	        	}
-	        	else if(this.cN.isDown)
-	        	{
-	        	    Sdown = false;
-	        	    player.body.velocity.y = 0;
-	        	    player.body.velocity.x = 0;
-	        	}
-	        }
-	        else if (this.cE.isDown) 
-	        {
-	            Edown = true;
-	        	player.body.velocity.x = speed;
-	        	player.body.velocity.y = -speed;
-	        	if(this.cW.isDown)
-	        	{
-	        	    Edown = false;
-	        	    player.body.velocity.y = 0;
-	        	    player.body.velocity.x = 0;
-	        	}
-	        }
-	        else if (this.cW.isDown)
-	        {
-	            Wdown = true;
-	        	player.body.velocity.x = -speed;
-	        	player.body.velocity.y = speed;
-	        	if(this.cE.isDown)
-	        	{
-	        	    Wdown = false;
-	        	    player.body.velocity.y = 0;
-	        	    player.body.velocity.x = 0;
-	        	}
-	        }
-	        else
-	        {
-	        	player.body.velocity.x = 0;
-	        	player.body.velocity.y = 0;
-	        }
-	        
-	        //which direction boolean activates which animation to play
-	        if (Ndown == true) 
-	        {
-	        	player.animations.play('N');
-	        }
-	        else if (Sdown == true)
-	        {
-	        	player.animations.play('S');
-	        }
-	        else if (Edown == true) 
-	        {
-	        	player.animations.play('E');
-	        }
-	        else if (Wdown == true)
-	        {
-	        	player.animations.play('W');
-	        }
-	        else if (SEdown == true)
-	        {
-	        	player.animations.play('SE');
-	        }
-	        else if (SWdown == true)
-	        {
-	        	player.animations.play('SW');
-	        }
-	        else if (NWdown == true)
-	        {
-	        	player.animations.play('NW');
-	        }
-	        else if (NEdown == true)
-	        {
-	        	player.animations.play('NE');
-	        }
-	        else
-	        {
-	        	player.animations.stop();
-	        }
-	        
-            Ndown = false, Sdown = false, Edown = false, Wdown = false, 
-            SEdown = false, NEdown = false, SWdown = false, NWdown = false;
+        player.body.velocity.y = 0;
+        
+        //using the Up, Down, Left, Right key
+        if (this.cN.isDown) 
+        {
+            Ndown = true;
+        	player.body.velocity.y = -speed;
+        	player.body.velocity.x = -speed;
+        	if(this.cE.isDown) 
+        	{
+        	    Ndown = false;
+        	    NEdown = true;
+        	    player.body.velocity.x = 0;
+        	}
+        	else if(this.cW.isDown)
+        	{
+        	    Ndown = false;
+        	    NWdown = true;
+        	    player.body.velocity.y = 0;
+        	}
+        	else if(this.cS.isDown)
+        	{
+        	    Ndown = false;
+        	    player.body.velocity.y = 0;
+        	    player.body.velocity.x = 0;
+        	}
+        }
+        else if (this.cS.isDown)
+        {
+            Sdown = true;
+        	player.body.velocity.y = speed;
+        	player.body.velocity.x = speed;
+        	if(this.cE.isDown) 
+        	{
+        	    Sdown = false;
+        	    SEdown = true;
+        	    player.body.velocity.y = 0;
+        	}
+        	else if(this.cW.isDown)
+        	{
+        	    Sdown = false;
+        	    SWdown = true;
+        	    player.body.velocity.x = 0;
+        	}
+        	else if(this.cN.isDown)
+        	{
+        	    Sdown = false;
+        	    player.body.velocity.y = 0;
+        	    player.body.velocity.x = 0;
+        	}
+        }
+        else if (this.cE.isDown) 
+        {
+            Edown = true;
+        	player.body.velocity.x = speed;
+        	player.body.velocity.y = -speed;
+        	if(this.cW.isDown)
+        	{
+        	    Edown = false;
+        	    player.body.velocity.y = 0;
+        	    player.body.velocity.x = 0;
+        	}
+        }
+        else if (this.cW.isDown)
+        {
+            Wdown = true;
+        	player.body.velocity.x = -speed;
+        	player.body.velocity.y = speed;
+        	if(this.cE.isDown)
+        	{
+        	    Wdown = false;
+        	    player.body.velocity.y = 0;
+        	    player.body.velocity.x = 0;
+        	}
+        }
+        else
+        {
+        	player.body.velocity.x = 0;
+        	player.body.velocity.y = 0;
+        }
+        
+        //which direction boolean activates which animation to play
+        if (Ndown == true) 
+        {
+        	player.animations.play('N');
+        }
+        else if (Sdown == true)
+        {
+        	player.animations.play('S');
+        }
+        else if (Edown == true) 
+        {
+        	player.animations.play('E');
+        }
+        else if (Wdown == true)
+        {
+        	player.animations.play('W');
+        }
+        else if (SEdown == true)
+        {
+        	player.animations.play('SE');
+        }
+        else if (SWdown == true)
+        {
+        	player.animations.play('SW');
+        }
+        else if (NWdown == true)
+        {
+        	player.animations.play('NW');
+        }
+        else if (NEdown == true)
+        {
+        	player.animations.play('NE');
+        }
+        else
+        {
+        	player.animations.stop();
+        }
+        
+        Ndown = false, Sdown = false, Edown = false, Wdown = false, 
+        SEdown = false, NEdown = false, SWdown = false, NWdown = false;
             
 	        game.physics.isoArcade.collide(levelGroup);
-
 	        //this is used to sort the depth of the tiles
             game.iso.topologicalSort(levelGroup);
-
+            
+            overLapCheck(player, StageSelect);
         },
+        
         render: function () {
             
             //game.debug.soundInfo(music, 20, 32);
@@ -669,6 +488,208 @@ var init = function () {
             game.debug.spriteInfo(player, 32, 32);
             game.debug.text(game.time.fps || '--', 2, 14, "#000");
             game.debug.text(Phaser.VERSION, 2, game.world.height - 2, "#ffff00");
+        }
+    };
+    
+    var spriteConfig = function (spr, xx, yy, tile, frame) {
+        
+        //this places a base groundTile object
+        //the z coord is half the overall width of one tile
+        tile = game.add.isoSprite(xx, yy, -40 * SCALE, 'groundTile', 0, floorGroup);
+        tile.anchor.set(0.5,1);
+        tile.scale.set(SCALE); 
+        //add if for player
+        if(spr == 'player')
+        {
+            //trying to find why the player sprite is spawning under a few other sprites
+            //set to -32 for the size of the sprite
+            player = game.add.isoSprite(xx, yy, -32 * SCALE, 'customCharacter', 0, levelGroup);
+            player.anchor.set(0.5, 1);
+            player.scale.setTo(0.9);
+            //=======================walking animations===========================//
+            
+            // custom Person sprite animation loading and setting
+            
+            speedPlayer = 6;
+            
+            player.animations.add('SW', [1, 0, 1, 2], speedPlayer, true);
+            player.animations.add('W',  [4, 3, 4, 5], speedPlayer, true);
+            player.animations.add('SE', [7, 6, 7, 8], speedPlayer, true);
+            player.animations.add('E',  [10, 9, 10, 11], speedPlayer, true);
+            player.animations.add('S',  [13, 12, 13, 14], speedPlayer, true);
+            player.animations.add('N',  [16, 15, 16, 17], speedPlayer, true);
+            player.animations.add('NW', [19, 18, 19, 20], speedPlayer, true);
+            player.animations.add('NE', [22, 21, 22, 23], speedPlayer, true);
+
+            //enables physics on the player
+            game.physics.isoArcade.enable(player);
+            player.body.collideWorldBounds = true;
+            
+            // x, y, z
+            player.body.setSize(20, 20, 1);
+        }
+        //animated characters in the office
+        else if(spr=='weston')
+        {
+            weston = game.add.isoSprite(xx+4, yy+4, -32 * SCALE, 'weston', 0, levelGroup)
+            weston.anchor.set(0.5, 1);
+            weston.scale.setTo(1);
+            
+            weston.animations.add('standing', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 6, true);
+            
+            game.physics.isoArcade.enable(weston);
+            weston.body.collideWorldBounds = true;
+            
+            // x, y, z
+            weston.body.setSize(20,20,1);
+            weston.body.bounce.set(1, 1, 0);
+            weston.body.drag.set(200, 200, 0);
+        }
+        //else if()
+        //{
+        //} //end of characters in office
+        else
+        {
+            if(spr=='DeskChairV1'||spr=='DeskChairV2'||spr=='DeskChairV3'||spr=='DeskChairV4')
+            {
+                //console.log('called chair group');
+                if(spr=='DeskChairV1')
+                {
+                    chair = game.add.isoSprite(xx, yy, -35 * SCALE, 'DeskChairV1', 0, levelGroup);
+                }
+                else if(spr=='DeskChairV2')
+                {
+                    chair = game.add.isoSprite(xx, yy, -35 * SCALE, 'DeskChairV2', 0, levelGroup);
+                }
+                else if(spr=='DeskChairV3')
+                {
+                    chair = game.add.isoSprite(xx, yy, -35 * SCALE, 'DeskChairV3', 0, levelGroup);
+                }
+                else if(spr=='DeskChairV4')
+                {
+                    chair = game.add.isoSprite(xx, yy, -35 * SCALE, 'DeskChairV4', 0, levelGroup);
+                }
+                chair.anchor.set(0.5, 1);
+                chair.scale.setTo(1);
+                
+                game.physics.isoArcade.enable(chair);
+                chair.body.collideWorldBounds = true;
+                
+                // x, y, z
+                if(spr=='DeskChairV1'||spr=='DeskChairV3')
+                {
+                    chair.body.setSize(30, 20, 1);
+                }
+                else if(spr=='DeskChairV2'||spr=='DeskChairV4')
+                {
+                    chair.body.setSize(20, 30, 1);
+                }
+                
+                chair.body.bounce.set(1, 1, 0);
+                chair.body.drag.set(100, 100, 0);
+                
+                chairList.push(chair);
+            }
+            else if(spr=='DoorFrameV1'||spr=='DoorFrameV2'||spr=='InternalWallDoorFrameV6'||spr=='InternalWallDoorFrameV7')
+            {
+                //console.log('called door frame group');
+                doorframe[frame] = game.add.isoSprite(xx, yy, -35 * SCALE, spr, 0, doorframes)
+                doorframe[frame].type = spr;
+                doorframe[frame].scale.set(SCALE);
+                doorframe[frame].anchor.set(0.5,1);
+                game.physics.isoArcade.enable(doorframe);
+                doorframe[frame].body.moves = false;
+                doorframe[frame++].body.immovable = true;
+            }
+            else if(spr != 'groundTile')
+            {
+                
+                if(spr=='DeskDrawerV3'||spr=='DeskDrawerV4'||spr=='DeskDrawerV3_f'||spr=='DeskDrawerV4_f')
+                {
+                    //corects postioning issues with these tiles
+                    xx -= 4;
+                    yy -= 3;
+                }
+                else if(spr=='DividerWallThinV3')
+                {
+                    xx += 35;
+                }
+                else if(spr=='DividerWallThinV4')
+                {
+                    yy += 35;
+                }
+                //the z coord is half the overall width of one object
+                tile = game.add.isoSprite(xx, yy, -35 * SCALE, spr, 0, levelGroup);
+                tile.type = spr;
+                tile.scale.set(SCALE);
+                tile.anchor.set(0.5,1);
+                game.physics.isoArcade.enable(tile);
+                tile.body.collisionWorldBounds = true;
+                if(spr=='InternalWallPillerV1'||spr=='InternalWallPillerV2'||spr=='InternalWallSlantV3')
+                {
+                    tile.body.setSize(15, 15, 1);
+                }
+                else if(spr=='InternalWallSlantV1')
+                {
+                    tile.body.setSize(20, 35, 1);
+                }
+                else if(spr=='LargeCabinetV1'||spr=='LargeCabinetV2'||spr=='LargeCabinetV3')
+                {
+                    tile.body.setSize(25, 35, 1);
+                }
+                else if(spr=='DeskArmV1'||spr=='DeskArmV2')
+                {
+                    tile.body.setSize(35, 25, 1);
+                }
+                else if(spr=='DeskArmV1_f'||spr=='DeskArmV2_f')
+                {
+                    tile.body.setSize(25, 35, 1);
+                }
+                else if(spr=='DividerWallThinV1')
+                {
+                    tile.body.setSize(10, 35, 1);
+                }
+                else if(spr=='DividerWallThinV2')
+                {
+                    tile.body.setSize(35, 10, 1);
+                }
+                else if(spr=='DividerWallThinV3')
+                {
+                    tile.body.setSize(1, 35, 1);
+                }
+                else if(spr=='DividerWallThinV4')
+                {
+                    tile.body.setSize(35, 1, 1);
+                }
+                else if(spr=='BlackCeiling')
+                {
+                    tile.body.setSize(35, 35, 1);
+                }
+                else if(spr=='NextStage')
+                {
+                    StageSelect = game.add.isoSprite(xx, yy, -35 * SCALE, spr, 0, levelGroup);
+                    tile.body.setSize(35, 35, 0);
+                }
+                //these should be conditionally applied to the correct tiles
+                tile.body.moves = false;
+                tile.body.immovable = true;
+            }
+        }
+        //add else and and if inside that points to everything thats not the groundTile
+    };
+    
+    var playerControls = function(player, speed) {
+        
+    };
+    
+    var overLapCheck = function(spr1, spr2) {
+        var boundsA = spr1.getBounds();
+        var boundsB = spr2.getBounds();
+            
+        if(Phaser.Rectangle.intersects(boundsA, boundsB)) { 
+            return true;
+        } else {
+            return false;
         }
     };
     
