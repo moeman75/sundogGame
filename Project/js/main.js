@@ -90,12 +90,25 @@ var levels = [
 [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 70, 0, 0, 70, 0, 0, 70, 0, 0, 70, 0, 70, 0, 0, 70],
 [2, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 37, 70, 70, 70, 70, 70, 70, 70, 0, 0, 0, 0, 0, 0, 0, 70],
 ],
-//more levels here
-[0,0,0,0,0],
-[0,0,0,0,0],
-[0,0,0,0,0],
-[0,0,0,0,0],
-[0,0,0,0,0],
+
+//floor 5
+[
+[0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0],
+[0, 0, 1, 0, 0],
+],
+
+//floor 6
+[
+[0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0],
+[0, 0, 1, 0, 0],
+],
+
 ];
             
 
@@ -106,7 +119,7 @@ var init = function () {
     
     console.log("init() called");
     
-    var game = new Phaser.Game(900, 600, Phaser.AUTO, 'test', null, false, true);
+    var game = new Phaser.Game(900, 500, Phaser.AUTO, 'test', null, false, true);
     
     var BasicGame = function (game) { };
     
@@ -116,7 +129,7 @@ var init = function () {
     {
         
         preload: function () {
-            //console.log("loadWorld() called");
+            console.log("preload() called");
  
             //game.world.setBounds(0, -window.innerHeight * 0.3, 5120, 5120);
             game.world.setBounds(0, -window.innerHeight * 0.3, 4028, 1500);
@@ -126,7 +139,10 @@ var init = function () {
             
             //========================loading assets==========================//
 
-            loadWorld();
+            loadWorld();        //using seperate sprite .pngs
+            
+            //TODO (possible frame rate increase but might just be unavoidable side effect os using phaser + assets)
+            //loadWorldJSON();  //using one entire sprite atlas 
                         
             //========================setting game settings==========================//
             
@@ -137,6 +153,7 @@ var init = function () {
             game.iso.anchor.setTo(0.5, 0);
         },
         create: function () {
+            //retrieve currentLevel number
             var currentLevel = 0;            
             var l = levels[currentLevel];
             var frame = 0;
@@ -156,7 +173,15 @@ var init = function () {
     
             // set the gravity in our game
 	        game.physics.isoArcade.gravity.setTo(0, 0, -500);
-    
+	        
+            //adds background color = #626469 which is light grey
+            game.stage.backgroundColor = "#626469";
+            
+            //==================================================//
+            
+            //var tileNames = loadSpriteSheetNames("https://sundog-game-grantmoe.c9users.io/Project/assets/spritesheet/completesprites.json");
+            //console.log(tileNames);
+            
             //==================================================//
 
             var tiles = [
@@ -256,7 +281,7 @@ var init = function () {
             'NextStage'         //71
             
             ];
-            
+            console.log(tiles);
             //==================================================//
             
             levelx = l.length;
@@ -267,35 +292,24 @@ var init = function () {
                     tilesProcessed++;
                     
                     var spr = tiles[l[x][y]];
+                    //var spr1 = tileNames[l[x][y]];
                     var xx = x * 38 * SCALE;
                     var yy = y * 38 * SCALE;
 
                     //spr, xx, yy method
                     spriteConfig(spr, xx, yy, tile, frame);
+                    //spriteConfigJSON(spr1, xx, yy, tile, frame);
                 }
             }
-            
-            
-            
+
             console.log("total tiles processed: " + tilesProcessed);
                         
             //=======================music===========================//
             
-            //adds background color = #626469 which is light grey
-            game.stage.backgroundColor = "#626469";
-            
             //adds music
-            console.log("music init.");
-            //music = game.add.audio('smash!');
-            
-            //loops here for entry of button
-            //while() {
-            //plays the music
-            //music.play();
-            //}
-            
-            //uncomment this for music
-            //music.play();
+            //TODO (music)
+            music = game.add.audio('smash!');
+            music.play();
 
             //========================character controls==========================//
             
@@ -455,15 +469,11 @@ var init = function () {
 	        //this is used to sort the depth of the tiles
             game.iso.topologicalSort(levelGroup);
             
-            if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                if(overLapCheck(player, StageSelect))
-                {
-                console.log("spaceBar");
+            if(overLapCheck(player, StageSelect)) {
+                if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+                    console.log("spaceBar");
                 }
-            }else{
-                
             }
-            
         },
         
         render: function () {
@@ -479,6 +489,207 @@ var init = function () {
             game.debug.spriteInfo(player, 32, 32);
             game.debug.text(game.time.fps || '--', 2, 14, "#000");
             game.debug.text(Phaser.VERSION, 2, game.world.height - 2, "#ffff00");
+        }
+    };
+    
+    var loadSpriteSheetNames = function (link) {
+        var tileNames = [];
+        
+        $.getJSON( link, function (data) {
+            $.each(data["frames"], function(key,val){
+                //console.log(data["frames"][key]["filename"]);
+                var name = data["frames"][key]["filename"];
+                console.log(name);
+                tileNames.push(name.toString());
+            });
+        }).done(function() {
+            console.log( "loaded spritesheet" );
+        }).fail(function() {
+            console.log( "failed to load spritesheet" );
+        });
+        
+        return tileNames;
+    };
+    
+    var spriteConfigJSON = function(spr, xx, yy, tile, frame) {
+        tile = game.add.isoSprite(xx, yy, -40 * SCALE, '0_groundTileV2', 0, floorGroup);
+        tile.anchor.set(0.5,1);
+        tile.scale.set(SCALE); 
+        if(spr == 'player')
+        {
+            //trying to find why the player sprite is spawning under a few other sprites
+            //set to -32 for the size of the sprite
+            player = game.add.isoSprite(xx, yy, -32 * SCALE, 'customCharacter', 0, levelGroup);
+            player.anchor.set(0.5, 1);
+            player.scale.setTo(0.9);
+            //=======================walking animations===========================//
+            
+            // custom Person sprite animation loading and setting
+            
+            speedPlayer = 6;
+            
+            player.animations.add('SW', [1, 0, 1, 2], speedPlayer, true);
+            player.animations.add('W',  [4, 3, 4, 5], speedPlayer, true);
+            player.animations.add('SE', [7, 6, 7, 8], speedPlayer, true);
+            player.animations.add('E',  [10, 9, 10, 11], speedPlayer, true);
+            player.animations.add('S',  [13, 12, 13, 14], speedPlayer, true);
+            player.animations.add('N',  [16, 15, 16, 17], speedPlayer, true);
+            player.animations.add('NW', [19, 18, 19, 20], speedPlayer, true);
+            player.animations.add('NE', [22, 21, 22, 23], speedPlayer, true);
+
+            //enables physics on the player
+            game.physics.isoArcade.enable(player);
+            player.body.collideWorldBounds = true;
+            
+            // x, y, z
+            player.body.setSize(20, 20, 1);
+        }
+        //animated characters in the office
+        else if(spr=='weston')
+        {
+            weston = game.add.isoSprite(xx+4, yy+4, -32 * SCALE, 'weston', 0, levelGroup)
+            weston.anchor.set(0.5, 1);
+            weston.scale.setTo(1);
+            
+            weston.animations.add('standing', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 6, true);
+            
+            game.physics.isoArcade.enable(weston);
+            weston.body.collideWorldBounds = true;
+            
+            // x, y, z
+            weston.body.setSize(20,20,1);
+            weston.body.bounce.set(1, 1, 0);
+            weston.body.drag.set(200, 200, 0);
+        }
+        //else if()
+        //{
+        //} //end of characters in office
+        else
+        {
+            if(spr=='DeskChairV1'||spr=='DeskChairV2'||spr=='DeskChairV3'||spr=='DeskChairV4')
+            {
+                //console.log('called chair group');
+                if(spr=='DeskChairV1')
+                {
+                    chair = game.add.isoSprite(xx, yy, -35 * SCALE, '19_DeskChairV1', 0, levelGroup);
+                }
+                else if(spr=='DeskChairV2')
+                {
+                    chair = game.add.isoSprite(xx, yy, -35 * SCALE, '61_DeskChairV2', 0, levelGroup);
+                }
+                else if(spr=='DeskChairV3')
+                {
+                    chair = game.add.isoSprite(xx, yy, -35 * SCALE, '62_DeskChairV3', 0, levelGroup);
+                }
+                else if(spr=='DeskChairV4')
+                {
+                    chair = game.add.isoSprite(xx, yy, -35 * SCALE, '63_DeskChairV4', 0, levelGroup);
+                }
+                chair.anchor.set(0.5, 1);
+                chair.scale.setTo(1);
+                
+                game.physics.isoArcade.enable(chair);
+                chair.body.collideWorldBounds = true;
+                
+                // x, y, z
+                if(spr=='DeskChairV1'||spr=='DeskChairV3')
+                {
+                    chair.body.setSize(30, 20, 1);
+                }
+                else if(spr=='DeskChairV2'||spr=='DeskChairV4')
+                {
+                    chair.body.setSize(20, 30, 1);
+                }
+                
+                chair.body.bounce.set(1, 1, 0);
+                chair.body.drag.set(100, 100, 0);
+                
+                chairList.push(chair);
+            }
+            else if(spr=='DoorFrameV1'||spr=='DoorFrameV2'||spr=='InternalWallDoorFrameV6'||spr=='InternalWallDoorFrameV7')
+            {
+                //console.log('called door frame group');
+                doorframe[frame] = game.add.isoSprite(xx, yy, -35 * SCALE, spr, 0, doorframes)
+                doorframe[frame].type = spr;
+                doorframe[frame].scale.set(SCALE);
+                doorframe[frame].anchor.set(0.5,1);
+                game.physics.isoArcade.enable(doorframe);
+                doorframe[frame].body.moves = false;
+                doorframe[frame++].body.immovable = true;
+            }
+            else if(spr != 'groundTile')
+            {
+                
+                if(spr=='DeskDrawerV3'||spr=='DeskDrawerV4'||spr=='DeskDrawerV3_f'||spr=='DeskDrawerV4_f')
+                {
+                    //corects postioning issues with these tiles
+                    xx -= 4;
+                    yy -= 3;
+                }
+                else if(spr=='DividerWallThinV3')
+                {
+                    xx += 35;
+                }
+                else if(spr=='DividerWallThinV4')
+                {
+                    yy += 35;
+                }
+                //the z coord is half the overall width of one object
+                tile = game.add.isoSprite(xx, yy, -35 * SCALE, spr, 0, levelGroup);
+                tile.type = spr;
+                tile.scale.set(SCALE);
+                tile.anchor.set(0.5,1);
+                game.physics.isoArcade.enable(tile);
+                tile.body.collisionWorldBounds = true;
+                if(spr=='InternalWallPillerV1'||spr=='InternalWallPillerV2'||spr=='InternalWallSlantV3')
+                {
+                    tile.body.setSize(15, 15, 1);
+                }
+                else if(spr=='InternalWallSlantV1')
+                {
+                    tile.body.setSize(20, 35, 1);
+                }
+                else if(spr=='LargeCabinetV1'||spr=='LargeCabinetV2'||spr=='LargeCabinetV3')
+                {
+                    tile.body.setSize(25, 35, 1);
+                }
+                else if(spr=='DeskArmV1'||spr=='DeskArmV2')
+                {
+                    tile.body.setSize(35, 25, 1);
+                }
+                else if(spr=='DeskArmV1_f'||spr=='DeskArmV2_f')
+                {
+                    tile.body.setSize(25, 35, 1);
+                }
+                else if(spr=='DividerWallThinV1')
+                {
+                    tile.body.setSize(10, 35, 1);
+                }
+                else if(spr=='DividerWallThinV2')
+                {
+                    tile.body.setSize(35, 10, 1);
+                }
+                else if(spr=='DividerWallThinV3')
+                {
+                    tile.body.setSize(1, 35, 1);
+                }
+                else if(spr=='DividerWallThinV4')
+                {
+                    tile.body.setSize(35, 1, 1);
+                }
+                else if(spr=='BlackCeiling')
+                {
+                    tile.body.setSize(35, 35, 1);
+                }
+                else if(spr=='NextStage')
+                {
+                    StageSelect = game.add.isoSprite(xx, yy, -35 * SCALE, spr, 0, levelGroup);
+                    tile.body.setSize(35, 35, 0);
+                }
+                //these should be conditionally applied to the correct tiles
+                tile.body.moves = false;
+                tile.body.immovable = true;
+            }
         }
     };
     
@@ -685,10 +896,6 @@ var init = function () {
         //add else and and if inside that points to everything thats not the groundTile
     };
     
-    var playerControls = function(player, speed) {
-        
-    };
-    
     var overLapCheck = function(spr1, spr2) {
         var boundsA = spr1.getBounds();
         var boundsB = spr2.getBounds();
@@ -700,9 +907,24 @@ var init = function () {
         }
     };
     
+    //var loadWorldJSONReMapped = function () {
+        //console.log("loadWorldJSONReMapped() called");
+        
+        //game.load.atlas('mysprite', 'assets/spritesheet/reMappedspritesheet.png', 'assets/spritesheet/reMappedSprites.json');
+        //game.load.spritesheet('customCharacter', 'assets/images/1_customCharacter.png', 40, 96);
+        //game.load.spritesheet('weston', 'assets/images/51_Weston.png', 40, 96);
+    //};
+    
+    var loadWorldJSON = function () {
+        console.log("loadWorldJSON() called");
+        
+        game.load.atlas('mysprite', 'assets/spritesheet/completespritesheet.png', 'assets/spritesheet/completesprites.json');
+        game.load.spritesheet('customCharacter', 'assets/images/1_customCharacter.png', 40, 96);
+        game.load.spritesheet('weston', 'assets/images/51_Weston.png', 40, 96);
+    };
+    
     var loadWorld = function () {
         console.log("loadWorld() called");
-        //game.load.image('name_of_item', 'location');
         game.load.image('groundTile', 'assets/images/0_groundTileV2.png');
         
         //sprites character sheet with size of sprite
@@ -802,7 +1024,7 @@ var init = function () {
         game.load.image('NextStage', 'assets/images/71_NextStage.png');
         
         //game.load.spriteshet('name_of_sprite', 'location');
-        //game.load.audio('smash!', 'assets/music/Smash!_-_Starbomb.ogg');
+        game.load.audio('smash!', 'assets/music/Smash!_-_Starbomb.ogg');
         
         //uses the png of the groundTile image
         //game.load.atlasJSONHash('tileSet', 'assets/images/spritesV1.png', 'assets/images/spritesV1.json');
