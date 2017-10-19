@@ -15,7 +15,7 @@ Fun isometric game for simulating the Sundog office!
 
 intern project for Sundog
 
-started creation:                   08/26/2017
+started creation:                   08/26/2016
 
 fourth floor creation completed:     04/10/2017
 
